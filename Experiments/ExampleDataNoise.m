@@ -22,7 +22,7 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
     [XTest, YTest] = createTestDataset(100);
 
     % Find critical points
-    weights = normalVector(cls, high_dim_vector, symbols);
+    weights = normalVector(cls, high_dim_vector, symbols, 1);
     cps = criticalPoints(symbols, high_dim_vector, weights);
     biases = findBiases(cps, weights, high_dim_vector, symbols, 2^-10, cls);
     
@@ -71,9 +71,9 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
         
         legend('Class 1', 'Class -1', 'Support Vectors', 'Decision Boundary');
         if d == 0
-            title("Baseline, β_0=" + numComponents);
+            title("Baseline, β_0=" + numComponents + ", accuracy=" + acc);
         else
-            title("Method 1, D_m="+ (abs(d)/m) + ", β_0=" + numComponents);
+            title("PTLS, D_m="+ (abs(d)/m) + ", β_0=" + numComponents + ", accuracy=" + acc);
         end
         xlabel('Input dimension');
         ylabel('Feature dimension');
@@ -94,7 +94,7 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
 
         % Refit the SVM
         newCls = fitcsvm(X2,Y2,'KernelFunction','kernelNoiseExample','BoxConstraint',Inf,'Prior','uniform');
-        weights = normalVector(newCls, high_dim_vector, symbols);
+        weights = normalVector(newCls, high_dim_vector, symbols, 1);
 
         % Sample points for smoother decision boundary plot
         sampleResolution = 1000;
@@ -140,7 +140,7 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
         ylim([-1, 1]);
         
         legend('Class 1', 'Class -1', 'Support Vectors', 'Decision Boundary');
-        title("Method 2, Critical Point: x=" + round(cp,3) + ", β_0=" + numComponents);
+        title("AACP, Critical Point: x=" + round(cp,3) + ", β_0=" + numComponents + ", accuracy=" + acc);
         xlabel('Input dimension');
         ylabel('Feature dimension');
         disp(acc);

@@ -1,8 +1,6 @@
 addpath("./")                       % Import functions
-%sympref('FloatingPointOutput',true) % Set display output to approximate Floating point
 rng(1);                             % For reproducibility
 syms x1;                            % Create symbol set (must match nr# input features of data)
-%digits(100);
 
 [X,Y] = createDataset();
 
@@ -20,7 +18,7 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
     high_dim_vector = [x1, x1^4-x1^2+0.1*x1];
 
     % Find critical points
-    weights = normalVector(cls, high_dim_vector, symbols);
+    weights = normalVector(cls, high_dim_vector, symbols, 1);
     cps = criticalPoints(symbols, high_dim_vector, weights);
     biases = findBiases(cps, weights, high_dim_vector, symbols, 2^-10, cls);
     
@@ -28,11 +26,11 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
     [XTest, YTest] = createTestDataset(100);
 
     for bias = [cls.Bias, biases']
-        disp('Bias=' + bias)
+        disp("Bias=" + bias)
         % Change in bias (distance the separator moved)
         d = bias-cls.Bias;
 
-        % Sample points for smoother decision boundary plot
+        % Sample points for using a grid for a decision boundary plot
         sampleResolution = 1000;
         x_vals = linspace(-1.75, 1.5, sampleResolution);
         g = nDGridGraph(size(symbols,1), sampleResolution);
@@ -72,13 +70,12 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
         
         legend('Class 1', 'Class -1', 'Support Vectors', 'Decision Boundary');
         if d == 0
-            title("Baseline, β_0=" + numComponents);
+            title("Baseline, β_0=" + numComponents + ", accuracy=" + acc);
         else
-            title("Method 1, D_m="+ (abs(d)/m) + ", β_0=" + numComponents);
+            title("PTLS, D_m="+ (abs(d)/m) + ", β_0=" + numComponents + ", accuracy=" + acc);
         end
         xlabel('Input dimension');
         ylabel('Feature dimension');
-        disp(acc);
         hold off;
     end
 
@@ -94,7 +91,7 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
 
         % Refit the SVM
         newCls = fitcsvm(X2,Y2,'KernelFunction','kernelBasisFunctionExample','BoxConstraint',Inf,'Prior','uniform');
-        weights = normalVector(newCls, high_dim_vector, symbols);
+        weights = normalVector(newCls, high_dim_vector, symbols, 1);
 
         % Sample points for smoother decision boundary plot
         sampleResolution = 1000;
@@ -139,7 +136,7 @@ function plot_svms_results_with_model(X, y, cls, symbols, m)
         ylim([-1, 1]);
         
         legend('Class 1', 'Class -1', 'Support Vectors', 'Decision Boundary');
-        title("Method 2, Critical Point: x=" + round(cp,3) + ", β_0=" + numComponents);
+        title("AACP, Critical Point: x=" + round(cp,3) + ", β_0=" + numComponents + ", accuracy=" + acc);
         xlabel('Input dimension');
         ylabel('Feature dimension');
         disp(acc);
