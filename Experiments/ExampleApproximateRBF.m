@@ -221,7 +221,7 @@ for cp = cps'
     ylabel("y")
 
     title("AACP, Critical Point: x=" + round(cp(1),3) + ", y=" + round(cp(2),3) + ", β_0=" + numComponents + ", accuracy=" + acc);
-    legend('Class 1', 'Class -1', 'Support Vectors', 'Decision Boundary');
+    legend('Prediction', 'Class 1', 'Class -1', 'Critical Points', 'Support Vectors');
     % Print LaTeX style table:
     % disp("$("+cp(1)+","+cp(2)+")$ & $"+numComponents+"$ & $"+numComponents_del+"$ & $"+acc+"$\%\\");
     hold off;
